@@ -1,5 +1,6 @@
 #pragma compile(Console, True)
 #pragma compile(ExecLevel, RequireAdministrator)
+#RequireAdmin
 #Include <File.au3>
 #include <WinAPIFiles.au3>
 #include <FileConstants.au3>
@@ -28,11 +29,11 @@ For $i = 1 To $driveArray[0]
 
 			ConsoleWrite("$sSourceFilePath "&$sSourceFilePath& @CRLF)
 			ConsoleWrite("$sDestPath " & $sDestPath & @CRLF)
-			ConsoleWrite(FileCopy($sSourceFilePath,  $sDestPath	, $FC_OVERWRITE))
+			ConsoleWrite(FileCopy($sSourceFilePath,  $sDestPath	, $FC_OVERWRITE) & @CRLF)
 		Next
 	EndIf
 Next
-
+MsgBox(4096, "Результат", "Я закончил")
 
 Func _FindFiles($sRoot, $sFile)
 
