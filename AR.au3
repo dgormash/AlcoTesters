@@ -1,6 +1,6 @@
 #pragma compile(Console, True)
 #pragma compile(ExecLevel, RequireAdministrator)
-;#RequireAdmin
+#RequireAdmin
 #Include <File.au3>
 #include <WinAPIFiles.au3>
 #include <FileConstants.au3>
