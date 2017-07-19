@@ -1,6 +1,6 @@
 #pragma compile(Console, True)
 #pragma compile(ExecLevel, RequireAdministrator)
-#RequireAdmin
+;#RequireAdmin
 #Include <File.au3>
 #include <WinAPIFiles.au3>
 #include <FileConstants.au3>
@@ -8,12 +8,11 @@
 ;Получаем список локальных дисков
 Local $driveArray = DriveGetDrive("FIXED")
 Local $resultArray
-
+Local $SourceFilePath
+Local $DestFilePath
 If Not FileExists (@DesktopDir & "\log.txt") Then
 	_FileCreate(@DesktopDir & "\log.txt")
  EndIf
-
-
 
 If @error Then
     ConsoleWrite("Error while attempting to get drives.")
@@ -33,10 +32,16 @@ For $i = 1 To $driveArray[0]
 	$resultArray = _FindFiles($driveArray[$i], "stat.mdb")
 	If IsArray($resultArray) Then
 		For $n = 1 To $resultArray[0]
-			Local $sSourceFilePath = @ScriptDir & "\stat_new.mdb"
-			Local $sDestPath = $driveArray[$i] & "\"& $resultArray[$n]
+			Local $jupExe = StringReplace($driveArray[$i] & "\" & $resultArray[$n], "stat.mdb", "StatisticAlc.exe")
+			Local $lionExe = StringReplace($driveArray[$i] & "\" & $resultArray[$n], "stat.mdb", "Statistic400.exe")
+			If(FileExists($jupExe)) Then
+				$SourceFilePath = @ScriptDir & "\jupiter_stat.mdb"
+			ElseIf (FileExists($lionExe)) Then
+				$SourceFilePath = @ScriptDir & "\lion_stat.mdb"
+			EndIf
+			Local $DestFilePath = $driveArray[$i] & "\"& $resultArray[$n]
 
-			If(FileCopy($sSourceFilePath,  $sDestPath	, $FC_OVERWRITE) = 1) then
+			If(ChangeFile($SourceFilePath, $DestFilePath) = 1) then
 				ConsoleWrite ("File " & $driveArray[$i] & "\"& $resultArray[$n] & " change status is OK" & @CRLF)
 				LogWrite("File " & $driveArray[$i] & "\"& $resultArray[$n] & " change status is OK" & @CRLF)
 			Else
@@ -48,6 +53,10 @@ For $i = 1 To $driveArray[0]
 Next
 MsgBox(4096, "Результат", "Я закончил")
 Run("notepad.exe" & " " & @DesktopDir & "\log.txt", @WindowsDir, @SW_MAXIMIZE)
+WinWait("[CLASS:Notepad]")
+$hNotepad = WinGetHandle("[CLASS:Notepad]")
+WinWaitClose($hNotepad)
+FileDelete(@DesktopDir & "\log.txt")
 
 
 Func _FindFiles($sRoot, $sFile)
@@ -68,4 +77,9 @@ Func LogWrite($sendedText)
    $file = FileOpen(@DesktopDir & "\log.txt", $FO_APPEND)
    FileWriteLine($file, $sendedText)
    FileClose($file)
+EndFunc
+
+Func ChangeFile($sourceFile, $destFile)
+	Local $result = FileCopy($sourceFile,  $destFile, $FC_OVERWRITE)
+	Return $result
 EndFunc
